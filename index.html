@@ -74,7 +74,13 @@
         }
 	.responsive {
             max-width: 100%; /* 確保不超過父容器 */
-	    }
+	}
+	.form-control {
+            max-width: 100%; /* 確保不超過容器 */
+    	    overflow: hidden; /* 隱藏溢出內容 */
+    	    text-overflow: ellipsis; /* 顯示省略號 */
+    	    white-space: nowrap; /* 防止換行 (如果要顯示完整內容，請移除這行) */
+    	}	
     </style>
 </head>
 <body>
