@@ -15,7 +15,7 @@
             color: #808080;
         }   
         .card {
-             border-radius: 12px;
+             border-radius: 14px;
         }
         .card-header {
             background-color: #007bff;
@@ -67,28 +67,31 @@
         .modal.show .modal-dialog {
             transform: translate(0, 0);
         }    
+        .hidden {
+    	     display: none;
+		}
     </style>
 </head>
 <body>
     <div class="d-flex align-items-start flex-wrap rounded-pill">
         <div class="card shadow m-3">
-            <h5 class="card-header rounded">A URL Shortener created using free Cloudflare worker and KV</h5>
+            <h5 class="card-header rounded">免費的自架短網址</h5>
             <div class="card-body">
                 <h5 class="card-title"> </h5>
                 <div class="input-group mb-3 gap-2">
-                    <span class="input-group-text rounded-pill" id="basic-addon1">Long URL</span>
-                    <input type="text" class="form-control rounded-pill" id="longURL" aria-describedby="basic-addon1" placeholder="Example: https://example.com/" oninput="loadUrlList()">
+                    <span class="input-group-text rounded-pill" id="basic-addon1">長連結</span>
+                    <input type="text" class="form-control rounded-pill" id="longURL" aria-describedby="basic-addon1" placeholder="示例: https://example.com/" oninput="loadUrlList()">
                 </div>
                 <div class="input-group mb-3 gap-2">
-                    <span class="input-group-text rounded-pill" id="basic-addon2">Custom Short URL</span>
+                    <span class="input-group-text rounded-pill" id="basic-addon2">自定義連結</span>
                     <input type="text" class="form-control rounded-pill" id="keyPhrase" aria-describedby="basic-addon2" placeholder="As you wish">
                 </div>
                 <div class="input-group mb-3 rounded-pill -flex justify-content-center">
-                    <button class="btn btn-primary w-100 rounded-pill" type="button" onclick='shorturl()' id="addBtn">Shorten it</button>
+                    <button class="btn btn-primary w-100 rounded-pill" type="button" onclick='shorturl()' id="addBtn">縮短！</button>
                 </div>
-                <div class="input-group mb-3 gap-2">
-                    <span class="input-group-text rounded-pill" id="basic-addon3">password</span>
-                    <input class="form-control rounded-pill" type="text" value="__PASSWORD__" readonly="true" id="passwordText" aria-describedby="basic-addon3">
+                <div class="input-group mb-3 gap-2 hidden">
+                    <span class="input-group-text rounded-pill hidden" id="basic-addon3">密碼</span>
+                    <input class="form-control rounded-pill hidden" type="text" value="__PASSWORD__" readonly="true" id="passwordText" aria-describedby="basic-addon3">
                 </div>
             </div>
             <div class="card-footer">
@@ -109,11 +112,11 @@
                     <div class="list-group" id="urlList">
                         <div class="mb-3 list-group-item">
                             <div class="input-group">
-                                <button type="button" class="btn btn-danger" onclick='deleteShortUrl("4sure")' id="delBtn-4sure">X</button>
-                                <button type="button" class="btn btn-info" onclick='queryVisitCount("4sure")' id="qryCntBtn-4sure">?</button>
-                                <span class="form-control">https://1way.eu.org/4sure</span>
+                                <button type="button" class="btn btn-danger rounded" onclick='deleteShortUrl("4sure")' id="delBtn-4sure">X</button>
+                                <button type="button" class="btn btn-info rounded" onclick='queryVisitCount("4sure")' id="qryCntBtn-4sure">?</button>
+                                <span class="form-control rounded">https://1way.eu.org/4sure</span>
                             </div>
-                            <div class="form-control">
+                            <div class="form-control gap-2 rounded">
                                 https://en.y2mate.is/s36/youtube-to-mp3.html
                             </div>
                         </div>
