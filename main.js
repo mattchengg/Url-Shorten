@@ -120,6 +120,10 @@ function loadUrlList() {
       addUrlToList(keyShortURL, valueLongURL)
     }
   }
+
+  // Ensure the LocalStorage list is visible when loading
+  const urlListSection = document.getElementById('urlList');
+  urlListSection.style.display = 'block';
 }
 
 function addUrlToList(shortUrl, longUrl) {
@@ -387,6 +391,15 @@ function buildValueTxt(longUrl) {
   valueTxt.classList.add("form-control", "rounded-top-0")
   valueTxt.innerText = longUrl
   return valueTxt
+}
+
+function toggleLocalStorageList() {
+  const urlList = document.getElementById('urlList');
+  if (urlList.style.display === 'none') {
+    urlList.style.display = 'block';
+  } else {
+    urlList.style.display = 'none';
+  }
 }
 
 document.addEventListener('DOMContentLoaded', function() {

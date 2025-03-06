@@ -61,3 +61,8 @@ img {
     background-color: #252d38;
   }
 } 
+
+/* CSS rules for handling the visibility and transitions of the LocalStorage list */
+#urlList {
+  transition: all 0.5s ease;
+}
