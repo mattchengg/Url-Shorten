@@ -114,3 +114,39 @@ img {
     background-color: #252d38;
   }
 } 
+
+/* Pd695 */
+@media (max-width: 1200px) {
+  .card {
+    width: 90%;
+  }
+}
+
+@media (max-width: 992px) {
+  .card {
+    width: 95%;
+  }
+}
+
+@media (max-width: 768px) {
+  .card {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .card {
+    width: 100%;
+    padding: 10px;
+  }
+}
+
+/* P5c92 */
+@media (max-width: 768px) {
+  .form-control {
+    font-size: 1rem;
+  }
+  .btn {
+    font-size: 1rem;
+  }
+}
