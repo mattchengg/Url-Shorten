@@ -75,11 +75,10 @@
 	.responsive {
             max-width: 100%; /* 確保不超過父容器 */
 	}
-	.form-control {
-            max-width: 100%; /* 確保不超過父容器 */
-            overflow: hidden; /* 隱藏溢出內容 */
-            text-overflow: ellipsis; /* 顯示省略號 */
-            white-space: nowrap; /* 防止換行 */
+	.fo {
+            word-break: break-word; /* 讓長單字換行 */
+            overflow-wrap: break-word; /* 讓長單字換行 (較新瀏覽器) */
+            white-space: normal; /* 確保可以換行 */
 	}
     </style>
 </head>
@@ -127,7 +126,7 @@
                                 <button type="button" class="btn btn-info rounded" onclick='queryVisitCount("4sure")' id="qryCntBtn-4sure">?</button>
                                 <span class="form-control rounded">https://zget.us.kg/JFwKrG</span>
                             </div>
-                            <div class="form-control gap-2 rounded w-100">
+                            <div class="form-control fo gap-2 rounded w-100">
                                 https://www.instagram.com/mattchengggg?igsh=MTlwZW9pbzMzZ3FxYw==
                             </div>
                         </div>
