@@ -79,11 +79,17 @@
             word-break: break-word; /* 讓長單字換行 */
             overflow-wrap: break-word; /* 讓長單字換行 (較新瀏覽器) */
             white-space: normal; /* 確保可以換行 */
+            flex: 1; /* Allows the item to grow and shrink as needed */
+            min-width: 0; /* Allows the item to shrink below its content size */
 	}
+        .parent-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
     </style>
 </head>
 <body>
-    <div class="d-flex align-items-start flex-wrap rounded-pill">
+    <div class="parent-container">
         <div class="card shadow m-3">
             <h5 class="card-header rounded">免費的自架短網址</h5>
             <div class="card-body">
