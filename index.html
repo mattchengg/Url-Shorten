@@ -69,7 +69,10 @@
         }    
         .hidden {
     	     display: none;
-		}
+        }
+	.responsive {
+             max-width: 100%; /* 確保不超過父容器 */
+	}
     </style>
 </head>
 <body>
@@ -109,7 +112,7 @@
                     <button class="btn btn-info flex-fill rounded-pill hidden" type="button" onclick='loadKV()' id="loadKV2localStgBtn">load KV to localStorage</button>
                 </div>
                 <div class="card-text">
-                    <div class="list-group" id="urlList">
+                    <div class="list-group responsive" id="urlList">
                         <div class="mb-3 list-group-item">
                             <div class="input-group">
                                 <button type="button" class="btn btn-danger rounded" onclick='deleteShortUrl("4sure")' id="delBtn-4sure">X</button>
