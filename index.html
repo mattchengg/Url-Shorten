@@ -75,15 +75,16 @@
 	.responsive {
             max-width: 100%; /* 確保不超過父容器 */
 	}
-	.fo {
-            word-break: break-word; /* 讓長單字換行 */
-            overflow-wrap: break-word; /* 讓長單字換行 (較新瀏覽器) */
-            white-space: normal; /* 確保可以換行 */
-	}
+	.form-control {
+            max-width: 100%; /* 確保不超過容器 */
+    	    overflow: hidden; /* 隱藏溢出內容 */
+    	    text-overflow: ellipsis; /* 顯示省略號 */
+    	    white-space: nowrap; /* 防止換行 (如果要顯示完整內容，請移除這行) */
+    	}	
     </style>
 </head>
 <body>
-    <div>
+    <div class="d-flex align-items-start flex-wrap rounded-pill">
         <div class="card shadow m-3">
             <h5 class="card-header rounded">免費的自架短網址</h5>
             <div class="card-body">
@@ -121,13 +122,13 @@
                 <div class="card-text">
                     <div class="list-group responsive" id="urlList">
                         <div class="mb-3 list-group-item">
-                            <div class="input-group parent-container">
+                            <div class="input-group">
                                 <button type="button" class="btn btn-danger rounded" onclick='deleteShortUrl("4sure")' id="delBtn-4sure">X</button>
                                 <button type="button" class="btn btn-info rounded" onclick='queryVisitCount("4sure")' id="qryCntBtn-4sure">?</button>
-                                <span class="form-control rounded">https://zget.us.kg/JFwKrG</span>
+                                <span class="form-control rounded">https://1way.eu.org/4sure</span>
                             </div>
-                            <div class="form-control fo gap-2 rounded w-100 parent-container">
-                                https://www.instagram.com/mattchengggg?igsh=MTlwZW9pbzMzZ3FxYw==
+                            <div class="form-control gap-2 rounded w-100">
+                                https://en.y2mate.is/s36/youtube-to-mp3.html
                             </div>
                         </div>
                     </div>
