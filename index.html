@@ -79,8 +79,8 @@
             word-break: break-word; /* 讓長單字換行 */
             overflow-wrap: break-word; /* 讓長單字換行 (較新瀏覽器) */
             white-space: normal; /* 確保可以換行 */
-            flex: 1;
-            min-width: 0;
+            flex: 1; /* Allows the item to grow and shrink as needed */
+            min-width: 0; /* Allows the item to shrink below its content size */
 	}
         .parent-container {
             display: flex;
