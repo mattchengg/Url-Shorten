@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Short link generator, Power by mattchengg">
+    <title>URL Shortener</title>
+    <!-- jQuery is required for jquery-qrcode -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include jquery-qrcode library -->
+    <script src="https://cdn.jsdelivr.net/gh/lrsjng/jquery-qrcode@0.18.0/dist/jquery-qrcode.min.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --bg-tertiary: #1e1e1e;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --text-tertiary: #808080;
+            --accent: #ffffff;
+            --border: #333333;
+            --button-hover: #333333;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --error: #ff4d4d;
+            --success: #4dffa6;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            display: flex;
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+        }
+        
+        .card {
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 30px;
+            flex: 1;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--border);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+        
+        .header {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            padding: 18px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-weight: 600;
+            font-size: 18px;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        input, button {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 18px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+        }
+        
+        input::placeholder {
+            color: var(--text-tertiary);
+        }
+        
+        button {
+            background-color: var(--accent);
+            color: var(--bg-primary);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: var(--bg-tertiary);
+            border-radius: 8px;
+            word-break: break-all;
+            display: none;
+            border: 1px solid var(--border);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .url-list {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+        .url-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .url-list::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+        }
+        
+        .url-list::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+        
+        .url-list::-webkit-scrollbar-thumb:hover {
+            background: var(--text-tertiary);
+        }
+        
+        .url-item {
+            background-color: var(--bg-tertiary);
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            position: relative;
+            word-break: break-all;
+            border: 1px solid var(--border);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .url-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .delete-btn {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            background-color: rgba(255, 77, 77, 0.1);
+            color: var(--error);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 77, 77, 0.2);
+        }
+        
+        .delete-btn:hover {
+            background-color: var(--error);
+            color: white;
+        }
+        
+        .url-details {
+            margin-bottom: 15px;
+            padding-right: 30px;
+        }
+        
+        .url-label {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .url-value {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+        
+        .url-value a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: opacity 0.2s ease;
+        }
+        
+        .url-value a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+        
+        .copy-btn, .qr-btn, .download-btn {
+            background-color: var(--bg-secondary);
+            padding: 8px 15px;
+            border-radius: 6px;
+            margin-right: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            border: 1px solid var(--border);
+        }
+        
+        .copy-btn:hover, .qr-btn:hover, .download-btn:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-2px);
+        }
+        
+        .github-link {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .github-link a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s ease;
+        }
+        
+        .github-link a:hover {
+            color: var(--text-primary);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 0.8s linear infinite;
+        }
+        
+        .loading-text {
+            margin-top: 10px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .qr-code-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .qr-code {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            display: inline-block;
+            box-shadow: var(--shadow);
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .qr-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .qr-modal-content {
+            background-color: var(--bg-secondary);
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto;
+            position: relative;
+            border: 1px solid var(--border);
+            box-shadow: var(--card-shadow);
+            animation: scaleIn 0.3s ease;
+        }
+        
+        .qr-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: rgba(255, 77, 77, 0.1);
+            color: var(--error);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 77, 77, 0.2);
+        }
+        
+        .qr-modal-close:hover {
+            background-color: var(--error);
+            color: white;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--text-tertiary);
+        }
+        
+        .empty-state-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        .empty-state-text {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .empty-state-subtext {
+            font-size: 14px;
+            color: var(--text-tertiary);
+        }
+        
+        .success-message {
+            color: var(--success);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+        }
+        
+        .error-message {
+            color: var(--error);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .card {
+                margin-bottom: 20px;
+            }
+            
+            body {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">URL Shortener</div>
+            <input type="text" id="longUrl" placeholder="Enter long URL (e.g., https://example.com/)" />
+            <div id="customUrlContainer">
+                 <input type="text" id="customUrl" placeholder="Custom short URL (optional)" />
+            </div>
+            <button id="shortenBtn">Shorten URL</button>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <div class="loading-text">Processing your URL...</div>
+            </div>
+            <div class="result" id="result"></div>
+            <div class="github-link">
+                <a href="https://github.com/mattchengg/Url-Shorten" target="_blank">Fork me on GitHub</a>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="header">Your Shortened URLs</div>
+            <div class="url-list" id="urlList"></div>
+        </div>
+    </div>
+    
+    <!-- QR Code Modal -->
+    <div class="qr-modal" id="qrModal">
+        <div class="qr-modal-content">
+            <div class="qr-modal-close" id="qrModalClose">×</div>
+            <h3 style="margin-bottom: 20px; font-weight: 600; font-size: 20px;">QR Code</h3>
+            <div id="qrModalContent"></div>
+            <div style="margin-top: 20px; text-align: center;">
+                <div class="download-btn" id="qrModalDownload">Download QR Code</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://zget.us.kg';
+        const longUrlInput = document.getElementById('longUrl');
+        const customUrlInput = document.getElementById('customUrl');
+        const shortenBtn = document.getElementById('shortenBtn');
+        const resultDiv = document.getElementById('result');
+        const urlListDiv = document.getElementById('urlList');
+        const loadingDiv = document.getElementById('loading');
+        const qrModal = document.getElementById('qrModal');
+        const qrModalClose = document.getElementById('qrModalClose');
+        const qrModalContent = document.getElementById('qrModalContent');
+        const qrModalDownload = document.getElementById('qrModalDownload');
+        
+        // Generate QR Code using jquery-qrcode
+        function buildQrcode(container, shortUrl) {
+            $(container).empty().qrcode({
+                // render method: 'canvas', 'image' or 'div'
+                render: 'canvas',
+                
+                // version range somewhere in 1 .. 40
+                minVersion: 1,
+                maxVersion: 40,
+                
+                // error correction level: 'L', 'M', 'Q' or 'H'
+                ecLevel: 'Q',
+                
+                // offset in pixel if drawn onto existing canvas
+                left: 0,
+                top: 0,
+                
+                // size in pixel
+                size: 256,
+                
+                // code color or image element
+                fill: '#000',
+                
+                // background color or image element, null for transparent background
+                background: '#fff',
+                
+                // content
+                text: shortUrl,
+                
+                // corner radius relative to module width: 0.0 .. 0.5
+                radius: 0,
+                
+                // quiet zone in modules
+                quiet: 1,
+                
+                // modes
+                // 0: normal
+                // 1: label strip
+                // 2: label box
+                // 3: image strip
+                // 4: image box
+                mode: 0
+            });
+        }
+        
+        // Download QR Code
+        function downloadQRCode(containerId, fileName) {
+            const canvas = document.querySelector(`#${containerId} canvas`);
+            if (canvas) {
+                const link = document.createElement('a');
+                link.download = fileName;
+                link.href = canvas.toDataURL('image/png');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+        
+        // Show QR Code Modal
+        function showQRModal(url, title) {
+            qrModalContent.innerHTML = `
+                <p style="margin-bottom: 15px; color: var(--text-secondary);">${title}</p>
+                <div class="qr-code">
+                    <div id="modal-qrcode"></div>
+                </div>
+                <div style="margin-top: 15px; text-align: center; color: var(--text-secondary); font-size: 14px;">
+                    ${url}
+                </div>
+            `;
+            
+            buildQrcode('#modal-qrcode', url);
+            
+            // Set up download button
+            qrModalDownload.onclick = () => {
+                downloadQRCode('modal-qrcode', `qrcode-${url.replace(/[^a-zA-Z0-9]/g, '-')}.png`);
+            };
+            
+            qrModal.style.display = 'flex';
+        }
+        
+        // Close QR Modal
+        qrModalClose.addEventListener('click', () => {
+            qrModal.style.display = 'none';
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === qrModal) {
+                qrModal.style.display = 'none';
+            }
+        });
+        
+        // Close modal with Escape key
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && qrModal.style.display === 'flex') {
+                qrModal.style.display = 'none';
+            }
+        });
+        
+        // Load saved URLs from localStorage
+        function loadSavedUrls() {
+            const savedUrls = JSON.parse(localStorage.getItem('shortUrls') || '[]');
+            urlListDiv.innerHTML = '';
+            
+            if (savedUrls.length === 0) {
+                urlListDiv.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚡</div>
+                        <div class="empty-state-text">No shortened URLs yet</div>
+                        <div class="empty-state-subtext">Shorten a URL to see it here</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            savedUrls.forEach(item => {
+                const urlItem = document.createElement('div');
+                urlItem.className = 'url-item';
+                
+                const deleteBtn = document.createElement('div');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.textContent = '×';
+                deleteBtn.onclick = () => removeUrl(item.shortUrl, item.key);
+                
+                const urlDetails = document.createElement('div');
+                urlDetails.className = 'url-details';
+                
+                const longUrlLabel = document.createElement('div');
+                longUrlLabel.className = 'url-label';
+                longUrlLabel.textContent = 'Original URL';
+                
+                const longUrlValue = document.createElement('div');
+                longUrlValue.className = 'url-value';
+                longUrlValue.textContent = item.longUrl;
+                
+                const shortUrlLabel = document.createElement('div');
+                shortUrlLabel.className = 'url-label';
+                shortUrlLabel.textContent = 'Shortened URL';
+                
+                const shortUrlValue = document.createElement('div');
+                shortUrlValue.className = 'url-value';
+                shortUrlValue.innerHTML = `<a href="${item.shortUrl}" target="_blank">${item.shortUrl}</a>`;
+                
+                const actionButtons = document.createElement('div');
+                actionButtons.className = 'action-buttons';
+                
+                const copyBtn = document.createElement('div');
+                copyBtn.className = 'copy-btn';
+                copyBtn.textContent = 'Copy';
+                copyBtn.onclick = () => {
+                    navigator.clipboard.writeText(item.shortUrl);
+                    copyBtn.textContent = 'Copied!';
+                    setTimeout(() => {
+                        copyBtn.textContent = 'Copy';
+                    }, 2000);
+                };
+                
+                const qrBtn = document.createElement('div');
+                qrBtn.className = 'qr-btn';
+                qrBtn.textContent = 'QR Code';
+                qrBtn.onclick = () => {
+                    showQRModal(item.shortUrl, 'Scan this QR code to access the shortened URL:');
+                };
+                
+                actionButtons.appendChild(copyBtn);
+                actionButtons.appendChild(qrBtn);
+                
+                urlDetails.appendChild(longUrlLabel);
+                urlDetails.appendChild(longUrlValue);
+                urlDetails.appendChild(shortUrlLabel);
+                urlDetails.appendChild(shortUrlValue);
+                
+                urlItem.appendChild(deleteBtn);
+                urlItem.appendChild(urlDetails);
+                urlItem.appendChild(actionButtons);
+                
+                urlListDiv.appendChild(urlItem);
+            });
+        }
+        
+        // Save URL to localStorage
+        function saveUrl(longUrl, shortUrl, key) {
+            const savedUrls = JSON.parse(localStorage.getItem('shortUrls') || '[]');
+            
+            // Check if URL already exists
+            const exists = savedUrls.some(item => item.shortUrl === shortUrl);
+            if (!exists) {
+                savedUrls.unshift({ longUrl, shortUrl, key }); // Add to beginning of array
+                localStorage.setItem('shortUrls', JSON.stringify(savedUrls));
+            }
+            
+            loadSavedUrls();
+        }
+        
+        // Remove URL from localStorage and from the API
+        async function removeUrl(shortUrl, key) {
+            // First, try to delete from the API
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        cmd: "del",
+                        key: key,
+                        password: "s"
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.error) {
+                    console.error('Error deleting URL:', data.error);
+                }
+            } catch (error) {
+                console.error('Error deleting URL:', error);
+            }
+            
+            // Then remove from localStorage
+            const savedUrls = JSON.parse(localStorage.getItem('shortUrls') || '[]');
+            const updatedUrls = savedUrls.filter(item => item.shortUrl !== shortUrl);
+            localStorage.setItem('shortUrls', JSON.stringify(updatedUrls));
+            loadSavedUrls();
+        }
+        
+        // Shorten URL function
+        async function shortenUrl() {
+            const longUrl = longUrlInput.value.trim();
+            const customUrl = customUrlInput.value.trim();
+            
+            if (!longUrl) {
+                alert('Please enter a URL to shorten');
+                return;
+            }
+            
+            if (!longUrl.startsWith('http://') && !longUrl.startsWith('https://')) {
+                alert('URL must start with http:// or https://');
+                return;
+            }
+            
+            loadingDiv.style.display = 'block';
+            resultDiv.style.display = 'none';
+            
+            try {
+                const requestData = {
+                    cmd: "add",
+                    url: longUrl,
+                    password: "s"
+                };
+                
+                // If custom URL is provided, add it to the request
+                if (customUrl) {
+                    requestData.key = customUrl;
+                }
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    resultDiv.innerHTML = `
+                        <div class="error-message">
+                            ⚠️ Error: ${data.error}
+                        </div>
+                    `;
+                } else {
+                    const shortUrl = `${API_URL}/${data.key}`;
+                    
+                    resultDiv.innerHTML = `
+                        <div class="success-message">
+                            ✓ URL shortened successfully!
+                        </div>
+                        <div class="url-label">Shortened URL</div>
+                        <div class="url-value"><a href="${shortUrl}" target="_blank">${shortUrl}</a></div>
+                        <div class="action-buttons">
+                            <div class="copy-btn" id="copyResult">Copy</div>
+                            <div class="qr-btn" id="showQrCode">QR Code</div>
+                        </div>
+                        <div class="qr-code-container">
+                            <div class="qr-code">
+                                <div id="result-qrcode"></div>
+                            </div>
+                            <div class="download-btn" id="downloadQrCode" style="margin-top: 15px; display: inline-block;">
+                                Download QR Code
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Generate QR code
+                    buildQrcode('#result-qrcode', shortUrl);
+                    
+                    document.getElementById('copyResult').addEventListener('click', () => {
+                        navigator.clipboard.writeText(shortUrl);
+                        document.getElementById('copyResult').textContent = 'Copied!';
+                        setTimeout(() => {
+                            document.getElementById('copyResult').textContent = 'Copy';
+                        }, 2000);
+                    });
+                    
+                    document.getElementById('showQrCode').addEventListener('click', () => {
+                        showQRModal(shortUrl, 'Scan this QR code to access the shortened URL:');
+                    });
+                    
+                    document.getElementById('downloadQrCode').addEventListener('click', () => {
+                        downloadQRCode('result-qrcode', `qrcode-${data.key}.png`);
+                    });
+                    
+                    saveUrl(longUrl, shortUrl, data.key);
+                    
+                    // Clear input fields
+                    longUrlInput.value = '';
+                    customUrlInput.value = '';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error-message">
+                        ⚠️ Error: ${error.message}
+                    </div>
+                `;
+            } finally {
+                loadingDiv.style.display = 'none';
+                resultDiv.style.display = 'block';
+            }
+        }
+        
+        // Query URL function
+        async function queryUrl(key) {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        cmd: "qry",
+                        key: key,
+                        password: "s"
+                    })
+                });
+                
+                return await response.json();
+            } catch (error) {
+                console.error('Error querying URL:', error);
+                return { error: error.message };
+            }
+        }
+        
+        // Event listeners
+        shortenBtn.addEventListener('click', shortenUrl);
+        
+        // Allow Enter key to trigger shortening
+        longUrlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                shortenUrl();
+            }
+        });
+        
+        customUrlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                shortenUrl();
+            }
+        });
+        
+        // Load saved URLs on page load
+        document.addEventListener('DOMContentLoaded', loadSavedUrls);
+    </script>
+</body>
+</html>
+
